@@ -32,6 +32,6 @@ config:
   jwt:
     issuer: xwplay
     subject: smart-public-wm
-    token-header: token
+    token-key: token
     # 15天，单位：分钟
     expirationTimeInMinute: 21600

@@ -21,7 +21,7 @@ public class ConfigProperties {
     public static class JwtProperties {
         private String issuer;
         private String subject;
-        private String tokenHeader;
+        private String tokenKey;
         private Integer expirationTimeInMinute;
     }
 
