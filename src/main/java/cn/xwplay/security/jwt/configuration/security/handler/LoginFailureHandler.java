@@ -3,6 +3,7 @@ package cn.xwplay.security.jwt.configuration.security.handler;
 import cn.hutool.json.JSONUtil;
 import cn.xwplay.security.jwt.common.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
@@ -22,19 +23,20 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
   public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse response, AuthenticationException e) throws IOException {
     Response result;
     if (e instanceof UsernameNotFoundException || e instanceof BadCredentialsException) {
-      result = Response.error(e.getMessage());
+      result = Response.error(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
     } else if (e instanceof LockedException) {
-      result = Response.error("账户被锁定，请联系管理员!");
+      result = Response.error(HttpStatus.UNAUTHORIZED.value(),"账户被锁定，请联系管理员!");
     } else if (e instanceof CredentialsExpiredException) {
-      result = Response.error("证书过期，请联系管理员!");
+      result = Response.error(HttpStatus.UNAUTHORIZED.value(),"证书过期，请联系管理员!");
     } else if (e instanceof AccountExpiredException) {
-      result = Response.error("账户过期，请联系管理员!");
+      result = Response.error(HttpStatus.UNAUTHORIZED.value(),"账户过期，请联系管理员!");
     } else if (e instanceof DisabledException) {
-      result = Response.error("账户被禁用，请联系管理员!");
+      result = Response.error(HttpStatus.UNAUTHORIZED.value(),"账户被禁用，请联系管理员!");
     } else {
       log.error("登录失败：", e);
       result = Response.error("登录失败!");
     }
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setCharacterEncoding("utf-8");
     response.getWriter().write(JSONUtil.toJsonStr(result));

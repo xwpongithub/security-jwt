@@ -12,4 +12,9 @@ public class IndexController {
         return Response.ok();
     }
 
+    @GetMapping("test1")
+    public Response test1() {
+        return Response.ok("test1");
+    }
+
 }
