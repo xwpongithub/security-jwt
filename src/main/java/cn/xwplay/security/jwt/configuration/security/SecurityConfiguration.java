@@ -61,6 +61,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.formLogin().usernameParameter("username").passwordParameter("password")
                 .and().logout().logoutUrl("/logout");
         registry.antMatchers(HttpMethod.OPTIONS, "/**").denyAll();
+// 只需要判断用户是否登录的话打开以下两句代码，注释withObjectPostProcessor
+//        registry.antMatchers("/").permitAll();
+//        registry.anyRequest().authenticated();
         // url权限认证处理
         registry.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
             @Override
