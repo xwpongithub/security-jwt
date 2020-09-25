@@ -2,6 +2,7 @@ package cn.xwplay.security.jwt.configuration.security.authentication;
 
 import cn.hutool.json.JSONUtil;
 import cn.xwplay.security.jwt.common.Response;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,8 @@ public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
     } else {
       r = Response.error("jwtToken过期!");
     }
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("utf-8");
     response.getWriter().write(JSONUtil.toJsonStr(r));
   }
 

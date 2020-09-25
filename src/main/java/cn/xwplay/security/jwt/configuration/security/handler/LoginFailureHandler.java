@@ -3,6 +3,7 @@ package cn.xwplay.security.jwt.configuration.security.handler;
 import cn.hutool.json.JSONUtil;
 import cn.xwplay.security.jwt.common.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +35,8 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
       log.error("登录失败：", e);
       result = Response.error("登录失败!");
     }
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("utf-8");
     response.getWriter().write(JSONUtil.toJsonStr(result));
   }
 

@@ -4,7 +4,6 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.xwplay.security.jwt.configuration.ConfigProperties;
-import cn.xwplay.security.jwt.entity.AccountEntity;
 import cn.xwplay.security.jwt.entity.AccountTokenEntity;
 import cn.xwplay.security.jwt.service.IAccountService;
 import cn.xwplay.security.jwt.service.IAccountTokenService;
@@ -17,11 +16,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.security.ec.ECPublicKeyImpl;
 
 import javax.annotation.PostConstruct;
-import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.util.Date;
 import java.util.Map;
@@ -49,21 +45,12 @@ public class JwtUtil {
      * @param token token
      * @return claim
      */
-    public Claims getClaimsFromToken(String token) {
-        try {
+    public Claims getClaimsFromToken(String token) throws ExpiredJwtException,UnsupportedJwtException,MalformedJwtException,IllegalArgumentException,SignatureException{
             return Jwts.parserBuilder()
                     .setSigningKeyResolver(new JwtEs512SignKeyResolver())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException | SignatureException e) {
-            if (e instanceof ExpiredJwtException) {
-//                throw new FastException(FastUtil.getMessage("tokenExpired"));
-            } else  {
-//                throw new FastException(FastUtil.getMessage("invalidToken"));
-            }
-            return null;
-        }
     }
 
     /**
@@ -117,8 +104,7 @@ public class JwtUtil {
      * @return 过期时间
      */
     public Date getExpirationDateFromToken(String token) {
-        return getClaimsFromToken(token)
-                .getExpiration();
+        return getClaimsFromToken(token).getExpiration();
     }
 
     /**
@@ -139,26 +125,6 @@ public class JwtUtil {
      */
     private Date getExpirationTime(Date date) {
         return DateUtil.offset(date, DateField.MINUTE,jwtProperties.getExpirationTimeInMinute());
-    }
-
-    private class JwtEs512SignKeyResolver extends SigningKeyResolverAdapter {
-        @Override
-        public Key resolveSigningKey(JwsHeader jwsHeader, Claims claims) {
-            String keyId = jwsHeader.getKeyId();
-            AccountEntity account = accountService.getById(keyId);
-            if (account.getLocking()) {
-                return null;
-//                throw new FastException(FastUtil.getMessage("accountLocked"));
-            }
-            String strPubKey = accountTokenService.getById(keyId).getPublicKey();
-            byte[] bytePublicKey = Base64.decode(strPubKey);
-            try {
-                return new ECPublicKeyImpl(bytePublicKey);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
     }
 
 }

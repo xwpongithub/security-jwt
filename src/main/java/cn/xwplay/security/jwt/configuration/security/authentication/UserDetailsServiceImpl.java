@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             new QueryWrapper<AccountEntity>()
             .eq("username",username)
     );
-    if (account!=null) {
+    if (account==null) {
       throw new UsernameNotFoundException(SecurityConstant.USERNAME_NOT_FOUND);
     }
     return new SecurityUser(account);
